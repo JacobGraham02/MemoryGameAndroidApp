@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CustomMemoryGameKotlin</string>
+    <string name="pairs_0_4">Pairs: 0 / 4</string>
+    <string name="moves_0">Moves: 0</string>
+</resources>
