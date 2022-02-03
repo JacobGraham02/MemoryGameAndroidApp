@@ -3,6 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/CustomMemoryGameKotlin/app/src/main/res/drawable/ic_5g.xml" value="0.2985" />
+        <entry key="..\:/CustomMemoryGameKotlin/app/src/main/res/drawable/ic_6_ft_apart.xml" value="0.2985" />
+        <entry key="..\:/CustomMemoryGameKotlin/app/src/main/res/drawable/ic_android_icon.xml" value="0.2985" />
+        <entry key="..\:/CustomMemoryGameKotlin/app/src/main/res/drawable/ic_cake.xml" value="0.2985" />
         <entry key="..\:/CustomMemoryGameKotlin/app/src/main/res/layout/activity_main.xml" value="0.2297979797979798" />
         <entry key="..\:/CustomMemoryGameKotlin/app/src/main/res/layout/memory_card.xml" value="0.36666666666666664" />
       </map>
