@@ -7,15 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.jacobdgraham.custommemorygamekotlin.models.BoardSize
+import com.jacobdgraham.custommemorygamekotlin.models.MemoryCard
 import kotlin.math.min
 
 // ViewHolder allows access to all the views inside of one RecyclerView parent element. In our game, this allows access to one generic memory card.
 class MemoryBoardAdapter(
     private val context: Context,
     private val boardSize: BoardSize,
-    private val cardImages: List<Int> // The int represents the location of one of the drawable images
+    private val cards: List<MemoryCard>, // The int represents the location of one of the drawable images
+    private val cardClickListener: CardClickListener
 ) :
     RecyclerView.Adapter<MemoryBoardAdapter.ViewHolder>() {
 
@@ -24,14 +28,35 @@ class MemoryBoardAdapter(
         private const val MARGIN_SIZE = 10
         private const val TAG = "MemoryBoardAdapter"
     }
+    // Whoever constructs an instance of the MemoryBoardAdapter will be responsible for passing an instance of the interface
+    interface CardClickListener {
+        fun onCardClicked(position: Int)
+    }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val imageButton = itemView.findViewById<ImageButton>(R.id.btnImage);
 
         fun bind(position: Int) {
-            imageButton.setImageResource(cardImages[position]);
+            val memoryCard = cards[position]
+            imageButton.setImageResource(if (cards[position].isFaceUp) {
+                cards[position].identifier
+            } else {
+                R.drawable.ic_launcher_background
+            })
+            // alpha property refers to how visible the image button will be
+            imageButton.alpha = if (memoryCard.isMatched) .4f else 1.0f
+
+
+            val colourStateList = if (memoryCard.isMatched) ContextCompat.getColorStateList(context, R.color.color_gray) else null
+
+            //This property of class ViewCompat is a way to set the background or shading on the image button
+            ViewCompat.setBackgroundTintList(imageButton, colourStateList)
+
+            // When this click listener triggers, we want MemoryBoardAdapter to notify the main activity so the main activity can tell the MemoryCard
+            // class that the user has taken some action. The standard pattern for this is to use an interface.
             imageButton.setOnClickListener{
                 Log.i(TAG, "Clicked on position $position") // Logging information at the info level
+                cardClickListener.onCardClicked(position)
             }
         }
     }
