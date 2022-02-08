@@ -4,8 +4,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.jacobdgraham.custommemorygamekotlin.models.BoardSize
 import com.jacobdgraham.custommemorygamekotlin.models.MemoryCard
 import com.jacobdgraham.custommemorygamekotlin.models.MemoryGame
@@ -17,6 +19,7 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
     }
 
+    private lateinit var clRoot : ConstraintLayout
     private lateinit var memoryGame: MemoryGame
     private lateinit var adapter: MemoryBoardAdapter
     // The lateinit keyword allows you to avoid initializing a property when an object is constructed.
@@ -25,8 +28,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textViewNumMoves: TextView
     private var boardSize: BoardSize = BoardSize.EASY
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main) // Look in the layout directory of project resources and select activity_main layout.
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         // Layout weight is how much space the parent element should allocate for a child element
 
         // findViewById finds a view (element) in the content view activity_main.
+        clRoot = findViewById(R.id.clRoot)
         recyclerViewBoard = findViewById(R.id.recyclerViewBoard)
         textViewNumPairs = findViewById(R.id.txtViewNumPairs)
         textViewNumMoves = findViewById(R.id.txtViewNumMoves)
@@ -58,6 +60,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateGameWithCardFlip(position: Int) {
+        if (memoryGame.haveWon()) {
+            // Snackbar shows up at bottom of screen and displays a message on the screen for a user
+            Snackbar.make(clRoot, "You already won", Snackbar.LENGTH_LONG).show()
+            // Alert the user of an invalid move because the game has been won
+            return
+        }
+        if (memoryGame.isCardFaceUp(position)) {
+            Snackbar.make(clRoot, "Invalid move", Snackbar.LENGTH_LONG).show()
+            return
+        }
         memoryGame.flipCard(position)
         adapter.notifyDataSetChanged() // This notifies the recycler view to update because data on screen has changed
     }
