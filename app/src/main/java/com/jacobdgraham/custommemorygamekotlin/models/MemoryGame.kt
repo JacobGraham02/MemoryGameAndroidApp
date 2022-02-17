@@ -7,6 +7,7 @@ class MemoryGame(private val boardSize: BoardSize) {
     val cards: List<MemoryCard>
     var numPairsFound = 0
 
+    private var numCardFlips = 0
     private var indexOfSingleSelectedCard: Int? = null // Nullable integer with a default value of null
 
     // init keyword means "do this" when an instance of the class is initialized
@@ -21,6 +22,8 @@ class MemoryGame(private val boardSize: BoardSize) {
 
     // After we have flipped the card, we need to tell the RecyclerView adapter its contents have changed
     fun flipCard(position: Int): Boolean {
+        numCardFlips++
+        val card = cards[position]
         /**
          * There are 3 possible cases:
          * 0 cards previously flipped over => flip over selected card
@@ -34,11 +37,10 @@ class MemoryGame(private val boardSize: BoardSize) {
             indexOfSingleSelectedCard = position
         } else {
             // Exactly 1 card flipped over
-            val foundMatch = checkForMatch(indexOfSingleSelectedCard!!, position)
+            foundMatch = checkForMatch(indexOfSingleSelectedCard!!, position)
 
             indexOfSingleSelectedCard = null
         }
-        val card = cards[position]
         card.isFaceUp = !card.isFaceUp
         return foundMatch
     }
@@ -68,5 +70,12 @@ class MemoryGame(private val boardSize: BoardSize) {
 
     fun isCardFaceUp(position: Int): Boolean {
         return cards[position].isFaceUp
+    }
+
+    /**
+     * The number of card moves is calculated here. The number of moves will be incremented by 1 each time the user flips 2 cards.
+     */
+    fun getNumMoves(): Int {
+        return numCardFlips / 2
     }
 }

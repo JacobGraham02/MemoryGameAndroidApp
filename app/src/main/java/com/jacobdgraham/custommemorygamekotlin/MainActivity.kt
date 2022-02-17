@@ -67,10 +67,20 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (memoryGame.isCardFaceUp(position)) {
-            Snackbar.make(clRoot, "Invalid move", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(clRoot, "Invalid move", Snackbar.LENGTH_SHORT).show()
             return
         }
-        memoryGame.flipCard(position)
+
+        // If the card has been flipped
+        if (memoryGame.flipCard(position)) {
+            Log.i(TAG, "Found a match! Number of pairs found: ${memoryGame.numPairsFound}")
+            // Update the GUI which displays how many pairs of cards have been found.
+            textViewNumPairs.text = "Pairs: ${memoryGame.numPairsFound} / ${boardSize.getNumPairs()}"
+            if (memoryGame.haveWon()) {
+                Snackbar.make(clRoot, "You won! Congratulations", Snackbar.LENGTH_LONG).show()
+            }
+        }
+        textViewNumMoves.text = "Moves: ${memoryGame.getNumMoves()}";
         adapter.notifyDataSetChanged() // This notifies the recycler view to update because data on screen has changed
     }
 }
