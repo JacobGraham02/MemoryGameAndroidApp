@@ -4,9 +4,11 @@ import android.animation.ArgbEvaluator
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -92,20 +94,51 @@ class MainActivity : AppCompatActivity() {
     /*
      Override the original functionality of what happens when a menu option is selected. When a menu item option is selected (defined in the menu
      resource xml), a when construct will be used to determine which menu option was selected, and take an action based on that.
+     Each time a menu item is clicked, you must return true to indicate the menu item was successfully clicked
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // If the refresh menu item is clicked, show a dialog which allows the user to select if they want to reset their game.
         when (item.itemId) {
             R.id.menuItemRefreshGame -> {
                 if (memoryGame.getNumMoves() > 0 && !memoryGame.haveWon()) {
-                    showAlertDialog("Quit your current game?", null, View.OnClickListener {
+                    showAlertDialog("Reset your current game?", null, View.OnClickListener {
                         setupBoard()
                     })
                 }
-                // If the refresh menu item is clicked, reset all of the game cards.
-                setupBoard()
+                return true
+            }
+            R.id.menuItemNewGameSize -> {
+                showNewSizeDialog()
+                return true
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun showNewSizeDialog() {
+        // Inflate is a key word that implicitly means construct this object we are referring to.
+        val boardSizeView = LayoutInflater.from(this).inflate(R.layout.dialog_board_size, null)
+        // Kotlin uses type inference for variables. Therefore, the value assigned to radioGroupSizeSelected is the radio group for all of the buttons
+        // defined in the resource file inflated called dialog_board_size.xml.
+        val radioGroupSizeSelected = boardSizeView.findViewById<RadioGroup>(R.id.radioGroup)
+        // Display the current board size in the board size options menu depending on the current size of the game board.
+        when (boardSize) {
+            BoardSize.EASY -> radioGroupSizeSelected.check(R.id.rdoBtnEasy)
+            BoardSize.MEDIUM -> radioGroupSizeSelected.check(R.id.rdoBtnMedium)
+            BoardSize.HARD -> radioGroupSizeSelected.check(R.id.rdoBtnHard)
+        }
+
+        // boardSizeView constructs the layout file which contains the dialog of different board sizes (Easy, Medium, Hard).
+        // By supplying this, an alert dialog with this layout built into it will be created.
+        showAlertDialog("Choose new size", boardSizeView, View.OnClickListener {
+            // Set a new value for board size when option selected
+            boardSize = when (radioGroupSizeSelected.checkedRadioButtonId) {
+                R.id.rdoBtnEasy -> BoardSize.EASY
+                R.id.rdoBtnMedium -> BoardSize.MEDIUM
+                else -> {BoardSize.HARD}
+            }
+            setupBoard()
+        })
     }
 
     private fun showAlertDialog(title: String, view: View?, positiveClickListener: View.OnClickListener) {

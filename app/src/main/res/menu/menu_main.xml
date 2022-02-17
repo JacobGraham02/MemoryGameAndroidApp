@@ -3,6 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/menuItemNewGameSize"
+        android:title="Choose new game size"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/menuItemRefreshGame"
         android:icon="@drawable/ic_refresh_game"
         android:title="Refresh"
