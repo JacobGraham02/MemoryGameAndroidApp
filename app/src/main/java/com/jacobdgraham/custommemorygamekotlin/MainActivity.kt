@@ -1,9 +1,14 @@
 package com.jacobdgraham.custommemorygamekotlin
 
+import android.animation.ArgbEvaluator
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -40,8 +45,27 @@ class MainActivity : AppCompatActivity() {
         textViewNumPairs = findViewById(R.id.txtViewNumPairs)
         textViewNumMoves = findViewById(R.id.txtViewNumMoves)
 
+        setupBoard()
+    }
+
+    private fun setupBoard() {
+        // Reset the text views for the app to a value depending on the size of the game board
+        when (boardSize) {
+            BoardSize.EASY -> {
+                textViewNumMoves.text = "Easy: 4 x 2"
+                textViewNumPairs.text = "Pairs: 0 / 4"
+            }
+            BoardSize.MEDIUM -> {
+                textViewNumMoves.text = "Medium: 6 x 3"
+                textViewNumPairs.text = "Pairs: 0 / 9"
+            }
+            BoardSize.HARD -> {
+                textViewNumMoves.text = "Hard: 6 x 4"
+                textViewNumPairs.text = "Pairs: 0 / 12"
+            }
+        }
         // Construct our memory game by using the newly created class MemoryCard which builds all of the memory cards for us
-         memoryGame = MemoryGame(boardSize)
+        memoryGame = MemoryGame(boardSize)
 
         // LayoutManager: Measures and positions item views.
         // Adapter: Providing a binding for the data set to the views of the RecyclerView.
@@ -57,6 +81,39 @@ class MainActivity : AppCompatActivity() {
         // its children or contents of its adapter, and only the number of items in the adapter.
         // We are passing in this because the current class is a context.
         recyclerViewBoard.layoutManager = GridLayoutManager(this, boardSize.getWidth())
+    }
+
+    // Specify the options menu on an activity. Here we inflate (place) our menu resource defined in XML into the menuInflater callback.
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    /*
+     Override the original functionality of what happens when a menu option is selected. When a menu item option is selected (defined in the menu
+     resource xml), a when construct will be used to determine which menu option was selected, and take an action based on that.
+     */
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menuItemRefreshGame -> {
+                if (memoryGame.getNumMoves() > 0 && !memoryGame.haveWon()) {
+                    showAlertDialog("Quit your current game?", null, View.OnClickListener {
+                        setupBoard()
+                    })
+                }
+                // If the refresh menu item is clicked, reset all of the game cards.
+                setupBoard()
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun showAlertDialog(title: String, view: View?, positiveClickListener: View.OnClickListener) {
+        // Underscores show that we overriding an existing method defined in interface
+        AlertDialog.Builder(this).setTitle(title).setView(view).setNegativeButton("Cancel", null)
+            .setPositiveButton("Ok") { _, _->
+                positiveClickListener.onClick(null)
+            }.show()
     }
 
     private fun updateGameWithCardFlip(position: Int) {
